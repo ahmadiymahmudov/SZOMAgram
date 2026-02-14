@@ -1,0 +1,379 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ target_user.username }} - MAnstagram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #dbdbdb;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        .sidebar .logo {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #262626;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #262626;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .sidebar a:hover {
+            background: #f2f2f2;
+        }
+        .sidebar a svg {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding: 30px 0;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        .profile-info {
+            flex-grow: 1;
+        }
+        .profile-username {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .profile-bio {
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .stat-value {
+            font-weight: bold;
+        }
+        .profile-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #f2f2f2;
+        }
+
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 15px 0;
+            justify-content: center;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 2px solid black;
+        }
+
+        .profile-posts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .profile-post {
+            aspect-ratio: 1 / 1;
+            background: #ddd;
+            position: relative;
+        }
+        .profile-post img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .new-post {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #ccc;
+            cursor: pointer;
+        }
+        .new-post i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .new-post span {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .share-photos {
+            text-align: center;
+            padding: 40px 0;
+            color: #777;
+        }
+        .share-photos i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .share-photos h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .share-photos p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">SZOMAgram</div>
+    <a href="/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 20H5v-4h4v4zm6-12h-4V4h4v4zm4 16h-4v-4h4v4zM15 12h-4v-4h4v4zm-6 8H5v-4h4v4zm6 0h-4v-4h4v4z"/></svg> Home</a>
+    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 12.91 3 9 3S2 5.91 2 9.5c0 1.61.59 3.09 1.58 4.23L8 18v4h8v-4l4.42-4.42zM9 17c-1.33 0-2.5-1.17-2.5-2.5S7.67 12 9 12s2.5 1.17 2.5 2.5S10.33 17 9 17z"/></svg> Search</a>
+    <a href="/messages"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-7 12l-5-5 1.41-1.41L12 12.17l7-7L20.41 7 12 15.41z"/></svg> Messages</a>
+    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.5 11.5l-1.45 1.32z"/></svg> Notifications</a>
+    <a href="/post/create"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Create</a>
+    <a href="/{{ request.user.username }}/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</a>
+    <a href="#" style="margin-top: 20px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg> More</a>
+    <a href="#" style="font-size: 12px; color: #777; margin-top: 20px;">Also from Akhmadiy</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        {% if post.owner.image %}
+            <img src="{{ post.owner.image.url }}" alt="{{ post.owner.username }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+        {% else %}
+            <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23ddd'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" 
+                alt="{{ post.owner.username }}" 
+                style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+        {% endif %}
+        <div class="profile-info">
+            <div class="profile-username">{{ target_user.username }}</div>
+            <div class="profile-bio">
+                {{ target_user.bio|default:"No bio yet." }}
+            </div>
+            <!-- profile.html -->
+                <div class="profile-stats" style="display: flex; gap: 30px; margin-top: 15px;">
+                    <div>
+                        <strong>{{ target_user.posts.count }}</strong> posts
+                    </div>
+                    <div>
+                        <a href="/{{ target_user.username }}/followers/" style="text-decoration: none; color: inherit;">
+                            <strong>{{ target_user.followers.count }}</strong> followers
+                        </a>
+                    </div>
+                    <div>
+                        <a href="/{{ target_user.username }}/following/" style="text-decoration: none; color: inherit;">
+                            <strong>{{ target_user.following.count }}</strong> following
+                        </a>
+                    </div>
+                </div>
+            {% if request.user == target_user %}
+                <div class="profile-buttons">
+                    <a href="/accounts/edit/"><button class="btn">Edit profile</button></a>
+                    <button class="btn">View archive</button>
+                </div>
+            {% else %}
+                <form id="follow-form" method="post" action="{% url 'toggle_follow' target_user.username %}">
+                    {% csrf_token %}
+                    {% if request.user in target_user.followers.all %}
+                        <button type="submit" class="btn">Unfollow</button>
+                    {% else %}
+                        <button type="submit" class="btn">Follow</button>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="profile-tabs">
+        <div class="tab active" data-tab="posts">Posts</div>
+        {% if request.user == target_user %}
+        <div class="tab" data-tab="saved">Saved</div>
+        {% endif %}
+    </div>
+
+    <!-- Posts Grid - O'z postlari -->
+<!-- Posts Grid - O'z postlari -->
+        <div class="profile-posts" id="posts-grid">
+            {% for post in target_user.posts.all %}
+                <a href="{% url 'post_detail' post.id %}" style="text-decoration: none;">
+                    <div class="instagram-post" style="max-width: 300px; margin: 20px auto; background: white; border: 1px solid #dbdbdb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                        {% if post.post.url|slice:"-4:" in ".mp4.mov.avi" or post.post.url|slice:"-5:" in ".webm.mkv" %}
+                            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: black; display: flex; align-items: center; justify-content: center;">
+                                <video 
+                                    style="width: 100%; height: 100%; object-fit: cover;"
+                                    preload="metadata"
+                                    playsinline>
+                                    <source src="{{ post.post.url }}" type="video/mp4">
+                                    Sizning brauzeringiz video qo'llab-quvvatlamaydi.
+                                </video>
+                            </div>
+                        {% else %}
+                            <!-- Rasm -->
+                            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: #ddd; display: flex; align-items: center; justify-content: center;">
+                                <img src="{{ post.post.url }}" alt="Post" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                    </div>
+                </a>
+            {% empty %}
+                <div style="text-align: center; color: #777; grid-column: 1/-1; padding: 40px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="#ccc">
+                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    </svg>
+                    <h3 style="margin-top: 15px;">Share Photos</h3>
+                    <p>When you share photos, they will appear on your profile.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Saved Posts Grid - Saqlangan postlar (Boshida yashirilgan) -->
+        {% if request.user == target_user %}
+        <div class="profile-posts" id="saved-grid" style="display: none;">
+            {% for saved in saved_posts %}
+                <a href="{% url 'post_detail' saved.posts.id %}" style="text-decoration: none;">
+                    <div class="instagram-post" style="max-width: 300px; margin: 20px auto; background: white; border: 1px solid #dbdbdb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;">
+                        {% if saved.posts.post.url|slice:"-4:" in ".mp4.mov.avi" or saved.posts.post.url|slice:"-5:" in ".webm.mkv" %}
+                            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: black; display: flex; align-items: center; justify-content: center;">
+                                <video 
+                                    style="width: 100%; height: 100%; object-fit: cover;"
+                                    preload="metadata"
+                                    playsinline>
+                                    <source src="{{ saved.posts.post.url }}" type="video/mp4">
+                                    Sizning brauzeringiz video qo'llab-quvvatlamaydi.
+                                </video>
+                            </div>
+                        {% else %}
+                            <!-- Rasm -->
+                            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: #ddd; display: flex; align-items: center; justify-content: center;">
+                                <img src="{{ saved.posts.post.url }}" alt="Saved Post" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                    </div>
+                </a>
+            {% empty %}
+                <div style="text-align: center; color: #777; grid-column: 1/-1; padding: 40px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="#ccc">
+                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    <h3 style="margin-top: 15px;">No saved posts yet</h3>
+                    <p>Save posts to see them here.</p>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Saved Posts Grid - Saqlangan postlar -->
+    {% if request.user == target_user %}
+    {{ saved_posts }}
+    <div class="profile-posts" id="saved-grid" style="display: none;">
+        {% for saved in saved_posts %}
+            <a href="{% url 'post_detail' saved.posts.id %}" style="text-decoration: none;">
+                <div class="profile-post" style="cursor: pointer;">
+                    {% if saved.posts.post.url|slice:"-4:" in ".mp4.mov.avi" or saved.posts.post.url|slice:"-5:" in ".webm.mkv" %}
+                        <video style="width: 100%; height: 100%; object-fit: cover;" preload="metadata" playsinline>
+                            <source src="{{ saved.posts.post.url }}" type="video/mp4">
+                        </video>
+                    {% else %}
+                        <img src="{{ saved.posts.post.url }}" alt="Saved Post">
+                    {% endif %}
+                </div>
+            </a>
+        {% empty %}
+            <div style="text-align: center; color: #777; grid-column: 1/-1; padding: 40px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="#ccc">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <h3 style="margin-top: 15px;">No saved posts yet</h3>
+                <p>Save posts to see them here.</p>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab');
+    const postsGrid = document.getElementById('posts-grid');
+    const savedGrid = document.getElementById('saved-grid');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Active classni yangilash
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            const tabType = this.dataset.tab;
+
+            if (tabType === 'posts') {
+                postsGrid.style.display = 'grid';
+                if (savedGrid) savedGrid.style.display = 'none';
+            } else if (tabType === 'saved') {
+                postsGrid.style.display = 'none';
+                if (savedGrid) savedGrid.style.display = 'grid';
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>

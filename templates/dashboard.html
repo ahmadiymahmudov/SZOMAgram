@@ -1,0 +1,675 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    {% csrf_token %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manstagram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #dbdbdb;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        .sidebar .logo {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #262626;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #262626;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .sidebar a:hover {
+            background: #f2f2f2;
+        }
+        .sidebar a svg {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+        }
+
+        .story-bar {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .story-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 5px;
+            /* Instagram kabi qizil chegarali effekt */
+            border: 2px solid #e1306c;
+        }
+        .story-name {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 64px;
+        }
+
+        .instagram-post {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 10px;
+        }
+
+        .post-caption {
+            padding: 12px 16px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .suggestions {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 300px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .suggestions h4 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .suggestion-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .suggestion-info {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        .suggestion-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .suggestion-followers {
+            font-size: 12px;
+            color: #777;
+        }
+        .follow-btn {
+            color: #0095f6;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* === SEARCH MODAL STILI === */
+        .search-modal {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid #dbdbdb;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-modal.active {
+            transform: translateX(0);
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-header button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 10px;
+            color: #262626;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .search-user {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-user img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .search-user-info {
+            flex-grow: 1;
+        }
+
+        .search-user-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .search-user-followers {
+            font-size: 12px;
+            color: #777;
+        }
+
+        /* MORE MENU - Sidebar uchun */
+        .sidebar-more-menu {
+            position: fixed;
+            bottom: 80px;
+            left: 250px;
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1001;
+            border: 1px solid #dbdbdb;
+            padding: 16px;
+        }
+        .sidebar-more-menu.active {
+            display: block;
+        }
+        .sidebar-more-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #262626;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-radius: 6px;
+        }
+        .sidebar-more-item:hover {
+            background: #f2f2f2;
+        }
+        .sidebar-more-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+        .sidebar-more-divider {
+            height: 1px;
+            background: #dbdbdb;
+            margin: 8px 0;
+        }
+        .sidebar-more-title {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Bookmark button styles */
+        .save-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .save-btn svg {
+            transition: transform 0.2s;
+        }
+        .save-btn:hover svg {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="logo">MAnstagram</div>
+    <a href="/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 20H5v-4h4v4zm6-12h-4V4h4v4zm4 16h-4v-4h4v4zM15 12h-4v-4h4v4zm-6 8H5v-4h4v4zm6 0h-4v-4h4v4z"/></svg> Home</a>
+    
+    <!-- 🔍 SEARCH TUGMASI (URLsiz) -->
+    <a href="#" id="search-btn" style="display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #262626; font-size: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" style="margin-right: 10px;">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 12.91 3 9 3S2 5.91 2 9.5c0 1.61.59 3.09 1.58 4.23L8 18v4h8v-4l4.42-4.42zM9 17c-1.33 0-2.5-1.17-2.5-2.5S7.67 12 9 12s2.5 1.17 2.5 2.5S10.33 17 9 17z"/>
+        </svg>
+        Search
+    </a>
+
+
+    <a href="/messages"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-7 12l-5-5 1.41-1.41L12 12.17l7-7L20.41 7 12 15.41z"/></svg> Messages</a>
+    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.5 11.5l-1.45 1.32z"/></svg> Notifications</a>
+    <a href="/post/create"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Create</a>
+    <a href="/{{ request.user.username }}/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</a>
+    
+    <!-- More Tugmasi -->
+    <a href="#" id="sidebar-more-btn" style="margin-top: 20px; position: relative;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg> More
+    </a>
+    
+    <a href="#" style="font-size: 12px; color: #777; margin-top: 20px;">Also from Akhmadiy</a>
+</div>
+
+<!-- Sidebar More Menu -->
+<div class="sidebar-more-menu" id="sidebar-more-menu">
+    <div class="sidebar-more-title">Manage</div>
+    <a href="#" class="sidebar-more-item" id="switch-account-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        Switch Account
+    </a>
+    <div class="sidebar-more-divider"></div>
+    <a href="#" class="sidebar-more-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        Report a Problem
+    </a>
+    <a href="#" class="sidebar-more-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12l8.13-8.13z"/></svg>
+        Back to Old Version
+    </a>
+</div>
+
+<div class="main">
+    <div class="story-bar">
+        {% for story_user in story %}
+        <a href="{% url 'user_stories' story_user.owner.username %}" class="story-item-link">
+            <div class="story-bar">
+                {% for story_user in story %}
+                <a href="{% url 'user_stories' story_user.owner.username %}" style="text-decoration: none; color: inherit;">
+                    <div class="story-item">
+                        {% if story_user.owner.image %}
+                            <img src="{{ story_user.owner.image.url }}" alt="{{ story_user.owner.username }}" class="story-avatar">
+                        {% else %}
+                            <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24' fill='%23ddd'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"
+                                alt="{{ story_user.owner.username }}" class="story-avatar">
+                        {% endif %}
+                        <div class="story-name">{{ story_user.owner.username|truncatechars:10 }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% for post in posts %}
+    <div class="instagram-post" data-post-id="{{ post.id }}">
+        <!-- Post Header -->
+        <div class="post-header">
+            <a href="/{{ post.owner.username }}/" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                {% if post.owner.image %}
+                    <img src="{{ post.owner.image.url }}" alt="{{ post.owner.username }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+                {% else %}
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23ddd'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" 
+                        alt="{{ post.owner.username }}" 
+                        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+                {% endif %}
+            </a>
+            <a href="/{{ post.owner.username }}/" style="font-weight: bold; font-size: 14px; text-decoration: none; color: inherit;">
+                {{ post.owner.username }}
+            </a>
+            <span style="margin-left: auto; font-size: 20px; cursor: pointer;">⋯</span>
+        </div>
+
+        <!-- Post Media -->
+        {% if post.post.url|slice:"-4:" in ".mp4.mov.avi" or post.post.url|slice:"-5:" in ".webm.mkv" %}
+            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: black; display: flex; align-items: center; justify-content: center;">
+                <video 
+                    style="width: 100%; height: 100%; object-fit: cover;"
+                    preload="metadata"
+                    playsinline>
+                    <source src="{{ post.post.url }}" type="video/mp4">
+                    Sizning brauzeringiz video qo'llab-quvvatlamaydi.
+                </video>
+            </div>
+        {% else %}
+            <div style="position: relative; width: 100%; aspect-ratio: 9/16; background: #ddd; display: flex; align-items: center; justify-content: center;">
+                <img src="{{ post.post.url }}" alt="Post" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+        {% endif %}
+
+        <!-- Post Actions -->
+        <div style="padding: 12px 16px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <!-- ❤️ LIKE -->
+                <div class="like-btn" style="display: flex; align-items: center; cursor: pointer; font-size: 0;">
+                    {% if request.user in post.likes.all %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.91 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.91 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    {% endif %}
+                    <span class="like-count" style="margin-left: 6px; font-weight: bold; font-size: 14px; color: #262626;">
+                        {{ post.likes.count }}
+                    </span>
+                </div>
+
+                <!-- 💬 COMMENT -->
+                <a href="{% url 'post_detail' post.id %}" style="cursor: pointer; text-decoration: none; color: inherit;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
+                    </svg>
+                </a>
+
+                <!-- 📤 SHARE -->
+                <div style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M8 17l4-4m0 0l4 4m-4-4v10m0-10V3"/>
+                    </svg>
+                </div>
+
+                <!-- 🔖 BOOKMARK -->
+                <button class="save-btn" data-post-id="{{ post.id }}" data-saved="{% if request.user in post.saved.all %}true{% else %}false{% endif %}" style="background: none; border: none; cursor: pointer; padding: 0;">
+                    {% if request.user in post.saved.all %}
+                        <!-- Saved (filled) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#262626" viewBox="0 0 24 24">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
+                        </svg>
+                    {% else %}
+                        <!-- Not saved (outline) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
+                        </svg>
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+
+        <!-- Caption -->
+        <div class="post-caption">
+            <strong>{{ post.owner.username }}</strong> {{ post.text }}
+        </div>
+    </div>
+    {% empty %}
+    <p style="text-align: center; padding: 20px;">Hech qanday post yo'q.</p>
+    {% endfor %}
+</div>
+
+<!-- === SEARCH MODAL HTML === -->
+<div class="search-modal" id="search-modal">
+    <div class="search-header">
+        <button id="close-search">&times;</button>
+        <input type="text" class="search-input" id="search-input" placeholder="Search...">
+    </div>
+    <div class="search-results" id="search-results">
+        <!-- Natijalar shu yerga yuklanadi -->
+    </div>
+</div>
+
+<!-- === Barcha JS birgalikda === -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // === VIDEO AUTOPLAY ===
+    const videos = document.querySelectorAll('video');
+    let currentPlaying = null;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const video = entry.target;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
+                if (currentPlaying && currentPlaying !== video) {
+                    currentPlaying.pause();
+                }
+                video.play().catch(e => console.log("Play error:", e));
+                currentPlaying = video;
+            } else {
+                video.pause();
+            }
+        });
+    }, { threshold: [0, 0.25, 0.5, 0.75, 1.0] });
+
+    videos.forEach(video => {
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        observer.observe(video);
+    });
+
+    // === LIKE TUGMASI ===
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const container = this.closest('[data-post-id]');
+            const postId = container.dataset.postId;
+
+            fetch(`/post/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const redSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.91 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+                const outlineSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.91 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+
+                this.innerHTML = (data.liked ? redSvg : outlineSvg) + 
+                    `<span class="like-count" style="margin-left: 6px; font-weight: bold; font-size: 14px; color: #262626;">${data.like_count}</span>`;
+            })
+            .catch(err => {
+                console.error('Like xatosi:', err);
+            });
+        });
+    });
+
+    // === SAVE/BOOKMARK TUGMASI ===
+    document.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const postId = this.dataset.postId;
+            const isSaved = this.dataset.saved === 'true';
+            const saveBtn = this;
+
+            fetch(`/post/${postId}/save/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Filled bookmark (saved) - QORA
+                const filledSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#262626" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>`;
+                
+                // Outline bookmark (not saved) - OQ
+                const outlineSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>`;
+
+                // Update button state
+                if (data.saved) {
+                    saveBtn.innerHTML = filledSvg;
+                    saveBtn.dataset.saved = 'true';
+                } else {
+                    saveBtn.innerHTML = outlineSvg;
+                    saveBtn.dataset.saved = 'false';
+                }
+            })
+            .catch(err => {
+                console.error('Save xatosi:', err);
+            });
+        });
+    });
+
+    // === SEARCH MODAL ===
+    const searchBtn = document.getElementById('search-btn');
+    const searchModal = document.getElementById('search-modal');
+    const closeSearch = document.getElementById('close-search');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            searchModal.classList.add('active');
+            searchInput.focus();
+        });
+    }
+
+    if (closeSearch) {
+        closeSearch.addEventListener('click', function() {
+            searchModal.classList.remove('active');
+            searchInput.value = '';
+            searchResults.innerHTML = '';
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            if (query.length < 1) {
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            fetch(`/search/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    searchResults.innerHTML = '';
+                    if (!data.users || data.users.length === 0) {
+                        searchResults.innerHTML = '<p style="padding: 20px; text-align: center;">Foydalanuvchi topilmadi.</p>';
+                        return;
+                    }
+
+                    data.users.forEach(user => {
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'search-user';
+                        userDiv.innerHTML = `
+                            <img src="${user.image || 'https://via.placeholder.com/40'}" alt="${user.username}">
+                            <div class="search-user-info">
+                                <div class="search-user-name">${user.username}</div>
+                                <div class="search-user-followers">${user.followers_count} ta obunachi</div>
+                            </div>
+                        `;
+                        userDiv.addEventListener('click', function() {
+                            window.location.href = `/${user.username}/`;
+                        });
+                        searchResults.appendChild(userDiv);
+                    });
+                })
+                .catch(err => {
+                    console.error('Search xatosi:', err);
+                    searchResults.innerHTML = '<p style="padding: 20px; text-align: center;">Xatolik yuz berdi.</p>';
+                });
+        });
+    }
+
+    // Modal tashqarisini bosganda yopiladi
+    document.addEventListener('click', function(e) {
+        if (searchModal && !searchModal.contains(e.target) && e.target !== searchBtn) {
+            searchModal.classList.remove('active');
+            if (searchInput) searchInput.value = '';
+            if (searchResults) searchResults.innerHTML = '';
+        }
+    });
+
+    // === SIDEBAR MORE MENU ===
+    const sidebarMoreBtn = document.getElementById('sidebar-more-btn');
+    const sidebarMoreMenu = document.getElementById('sidebar-more-menu');
+
+    if (sidebarMoreBtn && sidebarMoreMenu) {
+        sidebarMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebarMoreMenu.classList.toggle('active');
+        });
+
+        // Click outside to close menu
+        document.addEventListener('click', function(e) {
+            if (!sidebarMoreBtn.contains(e.target) && !sidebarMoreMenu.contains(e.target)) {
+                sidebarMoreMenu.classList.remove('active');
+            }
+        });
+
+        // Switch Account button
+        const switchAccountBtn = document.getElementById('switch-account-btn');
+        if (switchAccountBtn) {
+            switchAccountBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Switch Account funksiyasi hozircha ishlab chiqilmoqda!');
+                // Bu yerda account switching logikasi bo'lishi kerak
+                sidebarMoreMenu.classList.remove('active');
+            });
+        }
+    }
+});
+</script>
+</body>
+</html>

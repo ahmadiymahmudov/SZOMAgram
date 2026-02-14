@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            color: #262626;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            max-width: 935px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            gap: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 236px;
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #dbdbdb;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid #dbdbdb;
+        }
+
+        .sidebar-section-title {
+            font-size: 12px;
+            color: #8e8e8e;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: #262626;
+        }
+
+        .sidebar-item:hover {
+            background: #f5f5f5;
+        }
+
+        .sidebar-item.active {
+            background: #efefef;
+            font-weight: 600;
+        }
+
+        .sidebar-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 30px 40px;
+        }
+
+        .main-content h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #efefef;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #dbdbdb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .profile-info p {
+            font-size: 14px;
+            color: #8e8e8e;
+        }
+
+        .change-photo-btn {
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .change-photo-btn:hover {
+            background: #1877f2;
+        }
+        .play-song-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0095f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .change-song-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #fafafa;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #a8a8a8;
+        }
+
+        .form-group textarea {
+            resize: none;
+            height: 100px;
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: #8e8e8e;
+            margin-top: 8px;
+        }
+
+        .form-group .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: #8e8e8e;
+            margin-top: 5px;
+        }
+
+        /* Toggle */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .toggle-label {
+            font-size: 16px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #dbdbdb;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: #262626;
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #1877f2;
+        }
+
+        /* Hidden file input */
+        .hidden-input {
+            display: none;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Settings</h2>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">How you use Instagram</div>
+                <a href="{% url 'edit_profile' %}" class="sidebar-item active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Edit profile
+                </a>
+                <a href="#" class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    Notifications
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Who can see your content</div>
+                <a href="#" class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Account privacy
+                </a>
+                <a href="#" class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    Blocked
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <a href="{% url 'user_profile' request.user.username %}" class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Edit profile</h1>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Profile Photo -->
+                <div class="profile-header">
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="{{ user.username }}" class="profile-avatar">
+                    {% else %}
+                        <div class="profile-avatar" style="background: #0095f6;">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                    <div class="profile-info">
+                        <h3>{{ user.username }}</h3>
+                        <p>{{ user.bio|default:"" }}</p>
+                    </div>
+                    <input type="file" name="image" id="image-input" class="hidden-input" accept="image/*">
+                    <button type="button" class="change-photo-btn" onclick="document.getElementById('image-input').click()">
+                        {% if user.image %}
+                            Change Photo
+                        {% else %}
+                            Add photo
+                        {% endif %}
+                    </button>
+                </div>
+
+                <div class="profile-header">
+                    {% if user.song %}
+                        <audio id="profile-song" src="{{ user.song.url }}" preload="metadata"></audio>
+                        <button type="button" class="play-song-btn" onclick="toggleSong()">
+                            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </button>
+                    {% endif %}
+                    {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="{{ user.username }}" class="profile-avatar">
+                    {% else %}
+                        <div class="profile-avatar" style="background: #0095f6;">{{ user.username|first|upper }}</div>
+                    {% endif %}
+                    <div class="profile-info">
+                        <h3>{{ user.username }}</h3>
+                        <p>{{ user.bio|default:"" }}</p>
+                    </div>
+                    <input type="file" name="song" id="song-input" class="hidden-input" accept="audio/*">
+                    <button type="button" class="change-song-btn" onclick="document.getElementById('song-input').click()">
+                        {% if user.song %}
+                            Change song
+                        {% else %}
+                            Add song
+                        {% endif %}
+                    </button>
+                </div>
+
+                <!-- Bio -->
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" maxlength="150" placeholder="Bio">{{ user.bio|default:'' }}</textarea>
+                    <p class="char-count"><span id="bio-count">{{ user.bio|length|default:0 }}</span> / 150</p>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Bio character counter
+        const bioInput = document.getElementById('bio');
+        const bioCount = document.getElementById('bio-count');
+
+        bioInput.addEventListener('input', function() {
+            bioCount.textContent = this.value.length;
+        });
+
+        // Image preview
+        const imageInput = document.getElementById('image-input');
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.querySelector('.profile-avatar');
+                    if (avatar.tagName === 'IMG') {
+                        avatar.src = e.target.result;
+                    } else {
+                        // Replace div with img
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Profile';
+                        img.className = 'profile-avatar';
+                        avatar.replaceWith(img);
+                    }
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    </script>
+    <script>
+    // Song input
+    const songInput = document.getElementById('song-input');
+    const changeSongBtn = document.querySelector('.change-song-btn');
+
+    songInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            
+            // Fayl hajmini tekshirish (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Qo\'shiq hajmi 10MB dan oshmasligi kerak!');
+                this.value = '';
+                return;
+            }
+
+            // Faqat audio formatlarini qabul qilish
+            if (!file.type.startsWith('audio/')) {
+                alert('Faqat audio fayllarini yuklash mumkin!');
+                this.value = '';
+                return;
+            }
+
+            // Tugma matnini yangilash
+            changeSongBtn.textContent = 'Change song';
+            changeSongBtn.style.background = '#00a651';
+            
+            setTimeout(() => {
+                changeSongBtn.style.background = '#0095f6';
+            }, 1500);
+        }
+    });
+
+    // Play/Pause toggle
+    function toggleSong() {
+        const audio = document.getElementById('profile-song');
+        const playIcon = document.getElementById('play-icon');
+        
+        if (audio.paused) {
+            audio.play();
+            playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+        } else {
+            audio.pause();
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        }
+    }
+    </script>
+</body>
+</html>

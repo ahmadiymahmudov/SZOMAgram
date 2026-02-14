@@ -1,0 +1,11 @@
+<div id="message-{{ message.id }}" class="flex justify-end">
+    <div class="flex items-end gap-2 max-w-[70%]">
+
+        <div class="px-4 py-2 rounded-xl bg-blue-500 text-white rounded-br-sm">
+            {{ message.body }}
+        </div>
+
+        <img src="{{ message.seneder.avatar }}" class="size-8 rounded-full object-cover">
+
+    </div>
+</div> 

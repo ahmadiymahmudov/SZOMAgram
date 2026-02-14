@@ -1,0 +1,259 @@
+<!-- templates/stories/user_stories.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Stories</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: black;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .story-container {
+            max-width: 500px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .story-item {
+            width: 100%;
+            max-width: 400px;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .story-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+        }
+
+        .story-header a {
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .story-media {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+        }
+
+        .story-media img, .story-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        .story-actions {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .story-actions svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            stroke: white;
+            cursor: pointer;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 20;
+            font-size: 24px;
+            color: white;
+        }
+
+        .story-caption {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            padding: 0 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            z-index: 10;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Video autoplay uchun */
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: black;
+        }
+    </style>
+</head>
+<body>
+
+{% for story in stories %}
+<div class="story-container">
+    <div class="story-item" data-story-id="{{ story.id }}">
+        <!-- Close Button -->
+        <div class="close-btn" onclick="window.history.back();">×</div>
+
+        <!-- Story Header -->
+        <div class="story-header">
+            <a href="/{{ story.owner.username }}/" style="display: flex; align-items: center; gap: 8px;">
+                {% if story.owner.image %}
+                    <img src="{{ story.owner.image.url }}" alt="{{ story.owner.username }}" class="avatar">
+                {% else %}
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23ddd'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E"
+                         alt="{{ story.owner.username }}" class="avatar">
+                {% endif %}
+                <strong>{{ story.owner.username }}</strong>
+            </a>
+        </div>
+
+        <!-- Story Media -->
+        <div class="story-media">
+            {% if story.story.url|slice:"-4:"|lower in ".mp4.mov.avi" or story.story.url|slice:"-5:"|lower in ".webm.mkv" %}
+                <video 
+                    preload="metadata"
+                    playsinline
+                    loop
+                    autoplay
+                    style="width: 100%; height: 100%; object-fit: contain;"
+                >
+                    <source src="{{ story.story.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% else %}
+                <img src="{{ story.story.url }}" alt="Story image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            {% endif %}
+        </div>
+
+        <!-- Story Actions (LIKE, COMMENT, SHARE, BOOKMARK) -->
+        <div class="story-actions">
+            <!-- ❤️ LIKE -->
+            <div class="like-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.91 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+
+            <!-- 💬 COMMENT -->
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
+                </svg>
+            </div>
+
+            <!-- 📤 SHARE -->
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M8 17l4-4m0 0l4 4m-4-4v10m0-10V3"/>
+                </svg>
+            </div>
+
+            <!-- 🔖 BOOKMARK -->
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<p style="text-align: center; padding: 20px;">No stories yet.</p>
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // === VIDEO AUTOPLAY SCROLLDA ===
+    const videos = document.querySelectorAll('video');
+    let currentPlaying = null;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const video = entry.target;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
+                if (currentPlaying && currentPlaying !== video) {
+                    currentPlaying.pause();
+                }
+                video.play().catch(e => console.log("Autoplay blocked:", e));
+                currentPlaying = video;
+            } else {
+                video.pause();
+            }
+        });
+    }, { threshold: [0, 0.25, 0.5, 0.75, 1.0] });
+
+    videos.forEach(video => {
+        observer.observe(video);
+    });
+
+    // === CLOSE BUTTON (X) ===
+    // Agar kerak bo'lsa, back button o'rniga window.close() ham ishlashi mumkin
+    document.querySelector('.close-btn')?.addEventListener('click', function() {
+        window.history.back();
+    });
+});
+</script>
+
+</body>
+</html>

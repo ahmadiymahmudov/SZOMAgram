@@ -1,0 +1,45 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Kirish</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container">
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-6 col-lg-4">
+        <div class="card p-4 shadow">
+          <h3 class="text-center mb-4">Tizimga kirish</h3>
+
+          {% if messages %}
+            {% for msg in messages %}
+              <div class="alert alert-danger">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="text" name="username" class="form-control" placeholder="Login yoki telefon raqam" required>
+            </div>
+            <div class="mb-3">
+              <input type="password" name="password" class="form-control" placeholder="Parol" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Kirish</button>
+          </form>
+
+          <!-- ✅ Faqat login qilmaganlarga ko'rinadi (chunki login qilganlar bu sahifaga kira olmaydi) -->
+          <div class="text-center mt-3">
+            <small>
+              Akkauntingiz yo‘qmi?  
+              <a href="{% url 'register' %}" class="text-decoration-none">Ro‘yxatdan o‘ting</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

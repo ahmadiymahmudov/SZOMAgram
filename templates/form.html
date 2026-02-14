@@ -1,0 +1,120 @@
+<!-- templates/form.html -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yangi Post</title>
+    <style>
+        body {
+            background: #fafafa;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .field {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #262626;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        button {
+            background: #e1306c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #c1275c;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #0095f6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>
+        {% if 'story' in request.path %}
+            Istoriya qo'shish
+        {% else %}
+            Yangi post
+        {% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Fayl yuklash -->
+        {% if 'post' in request.path %}
+        <div class="field">
+            <label for="{{ form.post.id_for_label }}">Fayl (rasm yoki video)</label>
+            {{ form.post }}
+            {% if form.post.errors %}
+                <div class="error">{{ form.post.errors }}</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="field">
+            <label for="{{ form.story.id_for_label }}">Fayl (rasm yoki video)</label>
+            {{ form.story }}
+            {% if form.story.errors %}
+                <div class="error">{{ form.story.errors }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Matn -->
+        <div class="field">
+            <label for="{{ form.text.id_for_label }}">Tavsif</label>
+            {{ form.text }}
+            {% if form.text.errors %}
+                <div class="error">{{ form.text.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit">
+            {% if 'story' in request.path %}Istoriya qo'shish{% else %}Post yaratish{% endif %}
+        </button>
+    </form>
+
+    <a href="/" class="back">← Bosh sahifaga qaytish</a>
+</div>
+
+</body>
+</html>
